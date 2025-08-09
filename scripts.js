@@ -4,6 +4,7 @@ const nome = document.getElementById('nome')
 const email = document.getElementById('email')
 const btn = document.getElementById('btn')
 const err = document.getElementById('err')
+const loader = document.getElementById('loader')
 
 
 
@@ -16,6 +17,7 @@ btn.addEventListener('click', () => {
 
 
 async function criarUsuarios() {
+
     const users = {
         name: nome.value.trim(),
         email: email.value.trim()
@@ -26,6 +28,7 @@ async function criarUsuarios() {
         err.textContent = "Preencha todos os campos."
         return
     }
+    loader.style.display = 'block'
 
     try {
         const resposta = await fetch(URL, {
@@ -33,28 +36,36 @@ async function criarUsuarios() {
             headers: { "Content-Type": 'application/json' },
             body: JSON.stringify(users)
         })
-
         if (!resposta.ok) throw new Error('Erro ao salvar usuário')
-
         const dados = await resposta.json()
-
         nome.value = ''
         email.value = ''
         console.log("Usuário salvo:", dados)
-
-  
         carregarDados()
-
         err.textContent = "Usuário cadastrado com sucesso!"
         setTimeout(() => {
             err.textContent = ""
-        }, 5000)
 
+        }, 5000)
     } catch (e) {
         console.error(e)
         err.textContent = "Erro ao cadastrar usuário."
+    } finally {
+        loader.style.display = 'none';
+        teste()
+
+
+
+
     }
+
 }
+function teste() {
+
+     carregarDados()
+
+}
+
 
 
 
@@ -98,10 +109,19 @@ async function carregarDados() {
 
 
 async function exluirUsuario(id) {
-    const exluirUsuario = await fetch(`${URL}/${id}`, {
-        method: 'DELETE'
-    })
-    carregarDados()
+
+    loader.style.display = 'block'
+    try {
+        const exluirUsuario = await fetch(`${URL}/${id}`, {
+            method: 'DELETE'
+        })
+        carregarDados()
+
+    } catch (err) {
+        alert("Erro ao excluir ")
+    } finally {
+        loader.style.display = 'none'
+    }
 }
 
 
